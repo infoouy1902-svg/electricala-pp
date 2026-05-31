@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Electrical Master App</title>
+    <style>
+        body { font-family: 'Segoe UI', sans-serif; margin: 0; background: #eef2f3; padding: 20px; }
+        .container { max-width: 450px; margin: auto; background: white; padding: 25px; border-radius: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); }
+        h1 { color: #2c3e50; text-align: center; margin-bottom: 25px; font-size: 22px; }
+        .page { display: none; }
+        .page.active { display: block; }
+        .menu-grid { display: flex; flex-direction: column; gap: 15px; }
+        .menu-item { background: #f8f9fa; border: 2px solid #dee2e6; border-radius: 15px; padding: 20px; cursor: pointer; display: flex; align-items: center; gap: 20px; transition: 0.3s; }
+        .menu-item:hover { background: #e7f1ff; border-color: #007bff; }
+        .menu-item div { font-size: 30px; }
+        .menu-item span { font-weight: bold; font-size: 18px; color: #333; }
+        label { display: block; margin-top: 15px; font-weight: bold; color: #555; }
+        input, select { width: 100%; padding: 12px; margin-top: 5px; border-radius: 10px; border: 1px solid #ddd; box-sizing: border-box; }
+        .btn-calc { width: 100%; padding: 15px; background: #27ae60; color: white; border: none; border-radius: 10px; font-weight: bold; margin-top: 20px; cursor: pointer; }
+        .btn-back { width: 100%; padding: 10px; background: #7f8c8d; color: white; border: none; border-radius: 10px; margin-top: 10px; cursor: pointer; }
+        .result-box { background: #d4edda; padding: 15px; border-radius: 10px; margin-top: 20px; text-align: center; font-size: 16px; color: #155724; font-weight: bold; min-height: 20px; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div id="home-page" class="page active">
+        <h1>⚡ เครื่องมือคำนวณไฟฟ้า</h1>
+        <div class="menu-grid">
+            <div class="menu-item" onclick="showPage('ohm-page')"><div>📐</div><span>กฎของโอห์ม</span></div>
+            <div class="menu-item" onclick="showPage('resistor-page')"><div>🌈</div><span>แถบสีตัว R</span></div>
+            <div class="menu-item" onclick="showPage('wire-page')"><div>🧵</div><span>ขนาดสายไฟ</span></div>
+            <div class="menu-item" onclick="showPage('cost-page')"><div>💰</div><span>คำนวณค่าไฟ</span></div>
+        </div>
+    </div>
+
+    <div id="ohm-page" class="page">
+        <h1>📐 กฎของโอห์ม</h1>
+        <label>โหมดคำนวณ:</label>
+        <select id="ohm-mode" onchange="updateOhmLabels()">
+            <option value="p">หาวัตต์ (P = V*I)</option>
+            <option value="r">หาความต้านทาน (R = V/I)</option>
+            <option value="i">หากระแส (I = V/R)</option>
+        </select>
+        <label id="label-v1">แรงดัน (V):</label><input type="number" id="ohm-v1" step="any">
+        <label id="label-v2">กระแส (I):</label><input type="number" id="ohm-v2" step="any">
+        <button class="btn-calc" onclick="calcOhm()">คำนวณผลลัพธ์</button>
+        <div id="ohm-res" class="result-box">ผลลัพธ์: -</div>
+        <button class="btn-back" onclick="showPage('home-page')">ย้อนกลับ</button>
+    </div>
+
+    <div id="resistor-page" class="page">
+        <h1>🌈 แถบสีตัวต้านทาน</h1>
+        <label>แถบ 1:</label><select id="r1"><option value="1">น้ำตาล(1)</option><option value="2">แดง(2)</option><option value="3">ส้ม(3)</option><option value="4">เหลือง(4)</option><option value="5">เขียว(5)</option><option value="6">น้ำเงิน(6)</option><option value="7">ม่วง(7)</option><option value="8">เทา(8)</option><option value="9">ขาว(9)</option></select>
+        <label>แถบ 2:</label><select id="r2"><option value="0">ดำ(0)</option><option value="1">น้ำตาล(1)</option><option value="2">แดง(2)</option><option value="3">ส้ม(3)</option><option value="4">เหลือง(4)</option><option value="5">เขียว(5)</option><option value="6">น้ำเงิน(6)</option><option value="7">ม่วง(7)</option><option value="8">เทา(8)</option><option value="9">ขาว(9)</option></select>
+        <label>แถบ 3 (ตัวคูณ):</label><select id="r3"><option value="1">ดำ(x1)</option><option value="10">น้ำตาล(x10)</option><option value="100">แดง(x100)</option><option value="1000">ส้ม(x1k)</option><option value="10000">เหลือง(x10k)</option><option value="0.1">ทอง(x0.1)</option><option value="0.01">เงิน(x0.01)</option></select>
+        <label>แถบ 4 (ความคลาดเคลื่อน):</label><select id="r4"><option value="5%">ทอง(±5%)</option><option value="10%">เงิน(±10%)</option></select>
+        <button class="btn-calc" onclick="calcRes()">คำนวณความต้านทาน</button>
+        <div id="res-res" class="result-box">ความต้านทาน: -</div>
+        <button class="btn-back" onclick="showPage('home-page')">ย้อนกลับ</button>
+    </div>
+
+    <div id="wire-page" class="page">
+        <h1>🧵 ขนาดสายไฟ</h1>
+        <label>กระแส (A):</label><input type="number" id="w-amp" step="any">
+        <button class="btn-calc" onclick="calcWire()">คำนวณ</button>
+        <div id="w-res" class="result-box">สายไฟที่แนะนำ: -</div>
+        <button class="btn-back" onclick="showPage('home-page')">ย้อนกลับ</button>
+    </div>
+
+    <div id="cost-page" class="page">
+        <h1>💰 คำนวณค่าไฟ</h1>
+        <label>วัตต์ (W):</label><input type="number" id="c-w" step="any">
+        <label>ชม.ใช้งาน/วัน:</label><input type="number" id="c-h" step="any">
+        <button class="btn-calc" onclick="calcCost()">คำนวณค่าไฟ</button>
+        <div id="c-res" class="result-box">ค่าไฟ: -</div>
+        <button class="btn-back" onclick="showPage('home-page')">ย้อนกลับ</button>
+    </div>
+</div>
+
+<script>
+    function showPage(id) { document.querySelectorAll('.page').forEach(p => p.classList.remove('active')); document.getElementById(id).classList.add('active'); }
+    
+    function updateOhmLabels() {
+        let mode = document.getElementById('ohm-mode').value;
+        document.getElementById('label-v1').innerText = "แรงดัน (V):";
+        document.getElementById('label-v2').innerText = (mode === 'i') ? "ความต้านทาน (R):" : "กระแส (I):";
+    }
+
+    function calcOhm() {
+        let v = parseFloat(document.getElementById('ohm-v1').value);
+        let v2 = parseFloat(document.getElementById('ohm-v2').value);
+        let mode = document.getElementById('ohm-mode').value;
+        let res = (mode === 'p') ? (v * v2).toFixed(2) + " วัตต์ (W)" : (v2 === 0 ? "Error" : (v / v2).toFixed(2) + (mode === 'r' ? " โอห์ม (Ω)" : " แอมป์ (A)"));
+        document.getElementById('ohm-res').innerText = "ผลลัพธ์: " + res;
+    }
+
+    function calcRes() {
+        let ohms = parseInt(document.getElementById('r1').value + document.getElementById('r2').value) * parseFloat(document.getElementById('r3').value);
+        let display = (ohms >= 1000000) ? (ohms / 1000000).toLocaleString() + " MΩ" : (ohms >= 1000) ? (ohms / 1000).toLocaleString() + " kΩ" : ohms.toLocaleString() + " Ω";
+        document.getElementById('res-res').innerText = "ความต้านทาน: " + display + " (" + document.getElementById('r4').value + ")";
+    }
+
+    function calcWire() {
+        let a = parseFloat(document.getElementById('w-amp').value);
+        let size = (a <= 4) ? "0.5 mm²" : (a <= 10) ? "1.0 mm²" : (a <= 15) ? "1.5 mm²" : (a <= 20) ? "2.5 mm²" : (a <= 25) ? "4.0 mm²" : (a <= 35) ? "6.0 mm²" : "เกิน 35A: โปรดปรึกษาวิศวกร";
+        document.getElementById('w-res').innerText = "สายไฟที่แนะนำ: " + size;
+    }
+
+    function calcCost() {
+        let w = parseFloat(document.getElementById('c-w').value), h = parseFloat(document.getElementById('c-h').value);
+        document.getElementById('c-res').innerText = "ค่าไฟต่อเดือน: " + ((w * h * 30) / 1000 * 4.5).toFixed(2) + " บาท";
+    }
+</script>
+</body>
+</html>
